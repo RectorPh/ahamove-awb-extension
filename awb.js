@@ -106,6 +106,18 @@ function fitItems() {
   }
 }
 
+// Keep the big tracking number on one line: long codes (e.g. Lazada's
+// 18-char AHMRT…VNA) shrink down to 11pt, and only wrap below that.
+function fitTracking() {
+  const el = $("tn");
+  el.style.whiteSpace = "nowrap";
+  for (let pt = 19; pt >= 11; pt -= 0.5) {
+    el.style.fontSize = pt + "pt";
+    if (el.scrollWidth <= el.clientWidth) return;
+  }
+  el.style.whiteSpace = "";
+}
+
 (async () => {
   let o;
   try {
@@ -123,6 +135,7 @@ function fitItems() {
   $("toolbar").hidden = false;
   await document.fonts.ready;
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  fitTracking();
   fitItems();
   document.body.dataset.ready = "1";
   $("btn-print").onclick = () => {
