@@ -24,20 +24,16 @@ const maskAddr = (a) => {
 const noteText = (n) => "Ghi chú: " + (n && n !== "-" ? n : "–");
 
 // ---------- data ----------
-async function loadOrder() {
-  const params = new URLSearchParams(location.search);
-  const key = params.get("k");
-  if (key && typeof chrome !== "undefined" && chrome.storage?.session) {
-    const got = await chrome.storage.session.get(key);
-    if (got[key]) return got[key];
-  }
-  // #data=<base64 JSON> — lets the page be opened directly for testing
-  if (location.hash.startsWith("#data=")) {
-    const b64 = location.hash.slice(6);
-    return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(decodeURIComponent(b64)), (c) => c.charCodeAt(0))));
-  }
-  return null;
+// The order arrives in the URL hash: awb.html?embed=1#data=<base64 UTF-8 JSON>
+function loadOrder() {
+  if (!location.hash.startsWith("#data=")) return null;
+  const b64 = decodeURIComponent(location.hash.slice(6));
+  return JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))));
 }
+
+// Inside the overlay on the warehouse page (iframe) vs. opened on its own.
+const EMBED = new URLSearchParams(location.search).get("embed") === "1" && window.parent !== window;
+const toParent = (msg) => { if (EMBED) window.parent.postMessage(msg, "*"); };
 
 // ---------- render ----------
 function render(o) {
@@ -113,7 +109,7 @@ function fitItems() {
 (async () => {
   let o;
   try {
-    o = await loadOrder();
+    o = loadOrder();
   } catch (e) {
     o = null;
   }
@@ -129,5 +125,16 @@ function fitItems() {
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
   fitItems();
   document.body.dataset.ready = "1";
-  $("btn-print").onclick = () => window.print();
+  $("btn-print").onclick = () => {
+    toParent({ type: "awb-print-start", title: document.title });
+    window.print();
+  };
+  window.addEventListener("afterprint", () => toParent({ type: "awb-print-end" }));
+  if (EMBED) {
+    document.body.classList.add("embed");
+    $("btn-close").hidden = false;
+    $("btn-close").onclick = () => toParent({ type: "awb-close" });
+    window.addEventListener("keydown", (e) => { if (e.key === "Escape") toParent({ type: "awb-close" }); });
+    $("btn-print").focus();
+  }
 })();

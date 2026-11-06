@@ -10,9 +10,12 @@ body { font-family: "Helvetica Neue", Arial, sans-serif; color: #000; background
 .toolbar .primary { background: #ff6633; border-color: #ff6633; color: #fff; }
 .toolbar .secondary { background: #fff; color: #14254b; }
 .toolbar button:disabled { opacity: .5; cursor: progress; }
-.toolbar .msg { color: #555; font-size: 12px; margin-left: 8px; }
 .stage { display: flex; justify-content: center; padding: 24px 16px 48px; }
 .paper { box-shadow: 0 2px 10px rgba(0,0,0,.18); background: #fff; }
+/* inside the overlay iframe on the warehouse page */
+body.embed .toolbar { justify-content: space-between; }
+body.embed .toolbar .tn { margin-right: auto; }
+body.embed .stage { padding: 16px 12px 20px; }
 .error { max-width: 520px; margin: 48px auto; padding: 24px; background: #fff; border-radius: 8px; font-size: 15px; line-height: 1.5; }
 
 @media print {
