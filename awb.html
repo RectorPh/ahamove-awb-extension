@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>AWB</title>
+<link rel="stylesheet" href="awb.css">
+<script src="lib/qrcode.js"></script>
+<script src="lib/JsBarcode.all.min.js"></script>
+</head>
+<body>
+<div class="toolbar" id="toolbar" hidden>
+  <span class="tn" id="tb-tn"></span>
+  <button class="primary" id="btn-print">In / Lưu PDF (A6)</button>
+</div>
+
+<div class="stage">
+  <div class="paper" id="paper" hidden>
+    <div class="label" id="label">
+      <div class="head">
+        <div class="logo"><img src="assets/logo-a-bw.png" alt=""><span>Ahamove</span></div>
+      </div>
+
+      <div class="box track">
+        <div class="qr" id="qr"></div>
+        <div class="track-r">
+          <div class="lbl">Tracking number</div>
+          <div class="tracking" id="tn"></div>
+          <svg class="bc" id="bc"></svg>
+        </div>
+      </div>
+
+      <div class="box parties">
+        <div class="party">
+          <h4>Người gửi</h4>
+          <div class="name" id="s-name"></div>
+          <div id="s-phone"></div>
+          <div class="addr" id="s-addr"></div>
+          <div class="note" id="s-note"></div>
+        </div>
+        <div class="party">
+          <h4>Người nhận</h4>
+          <div class="name" id="r-name"></div>
+          <div id="r-phone"></div>
+          <div class="addr" id="r-addr"></div>
+          <div class="note" id="r-note"></div>
+        </div>
+      </div>
+
+      <div class="box items">
+        <h4>Hàng hoá</h4>
+        <div class="metrics">
+          <div class="cell"><div class="lbl">Khối lượng</div><div class="v" id="w"></div></div>
+          <div class="cell"><div class="lbl">Kích thước (cm)</div><div class="v" id="dim"></div></div>
+          <div class="cell"><div class="lbl">KL đóng gói</div><div class="v" id="pw"></div></div>
+        </div>
+        <ul class="goods" id="goods"></ul>
+      </div>
+
+      <div class="box note-kho">
+        <div class="lbl">Ghi chú kho</div>
+        <div class="line"></div>
+      </div>
+    </div>
+  </div>
+  <div class="error" id="error" hidden></div>
+</div>
+
+<script src="awb.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+.DS_Store
+*.zip
+sample/*.pdf
+# local unzipped copy used for testing
+/ahamove-awb-extension/

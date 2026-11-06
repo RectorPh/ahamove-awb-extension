@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>AWB sample</title>
+<script src="../lib/qrcode.js"></script>
+<script src="../lib/JsBarcode.all.min.js"></script>
+<style>
+  @page { size: 105mm 148mm; margin: 0; } /* A6 */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 105mm; height: 148mm; background: #fff; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; color: #000; font-size: 7.8pt; line-height: 1.25; }
+  .label { width: 105mm; height: 148mm; padding: 2.5mm; display: flex; flex-direction: column; gap: 1.3mm; overflow: hidden; }
+  .box { border: 0.4mm solid #000; }
+  .lbl { font-size: 6.6pt; text-transform: uppercase; letter-spacing: .4px; color: #333; }
+
+  /* Header: logo */
+  .head { display: flex; align-items: center; justify-content: space-between; }
+  .logo { display: flex; align-items: center; gap: 1.6mm; }
+  .logo img { height: 7.5mm; width: auto; display: block; }
+  .logo span { font-size: 15pt; font-weight: 800; letter-spacing: -.2px; color: #000; }
+
+  /* Tracking: QR left, number + barcode right */
+  .track { display: flex; gap: 2.5mm; padding: 1.8mm 2mm; align-items: center; }
+  #qr { width: 22mm; height: 22mm; flex: none; }
+  #qr svg { width: 100%; height: 100%; display: block; }
+  .track-r { flex: 1; min-width: 0; }
+  .tracking { font-size: 19pt; font-weight: 900; letter-spacing: 1px; line-height: 1.05; margin: .2mm 0 1mm; }
+  #bc { width: 100%; height: 10mm; display: block; }
+
+  .parties { display: grid; grid-template-columns: 1fr 1fr; }
+  .party { padding: 1.4mm 1.8mm; min-width: 0; }
+  .party + .party { border-left: 0.4mm solid #000; }
+  .party h4, .items h4 { font-size: 7.2pt; text-transform: uppercase; letter-spacing: .4px; border-bottom: 0.25mm solid #000; padding-bottom: .5mm; margin-bottom: .8mm; }
+  .party .name { font-weight: 700; font-size: 8.4pt; }
+  .party .addr { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .party .note { margin-top: .6mm; font-style: italic; }
+
+  /* Items: takes all remaining height, auto-shrinks font when many items */
+  .items { flex: 1; min-height: 0; padding: 1.4mm 1.8mm; display: flex; flex-direction: column; }
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1mm; margin-bottom: 1.2mm; }
+  .cell { border: 0.25mm solid #000; padding: .6mm 1mm; }
+  .cell .v { font-weight: 800; font-size: 10pt; }
+  #goods { flex: 1; min-height: 0; overflow: hidden; list-style: none; }
+  #goods li { display: flex; gap: 1.2mm; padding: .5mm 0; border-bottom: 0.2mm dotted #777; }
+  #goods li:last-child { border-bottom: 0; }
+  #goods .qty { font-weight: 800; flex: none; min-width: 6mm; }
+  #goods .cat { color: #333; }
+
+  .note-kho { padding: 1.2mm 1.8mm; height: 9mm; flex: none; }
+  .line { border-bottom: 0.25mm dashed #000; height: 4mm; }
+
+</style>
+</head>
+<body>
+<div class="label">
+  <div class="head">
+    <div class="logo"><img src="../assets/logo-a-bw.png" alt=""><span>Ahamove</span></div>
+  </div>
+
+  <div class="box track">
+    <div id="qr"></div>
+    <div class="track-r">
+      <div class="lbl">Tracking number</div>
+      <div class="tracking" id="tn"></div>
+      <svg id="bc"></svg>
+    </div>
+  </div>
+
+  <div class="box parties">
+    <div class="party">
+      <h4>Người gửi</h4>
+      <div class="name" id="s-name"></div>
+      <div id="s-phone"></div>
+      <div class="addr" id="s-addr"></div>
+      <div class="note" id="s-note"></div>
+    </div>
+    <div class="party">
+      <h4>Người nhận</h4>
+      <div class="name" id="r-name"></div>
+      <div id="r-phone"></div>
+      <div class="addr" id="r-addr"></div>
+      <div class="note" id="r-note"></div>
+    </div>
+  </div>
+
+  <div class="box items">
+    <h4>Hàng hoá</h4>
+    <div class="metrics">
+      <div class="cell"><div class="lbl">Khối lượng</div><div class="v" id="w"></div></div>
+      <div class="cell"><div class="lbl">Kích thước (cm)</div><div class="v" id="dim"></div></div>
+      <div class="cell"><div class="lbl">KL đóng gói</div><div class="v" id="pw"></div></div>
+    </div>
+    <ul id="goods"></ul>
+  </div>
+
+  <div class="box note-kho">
+    <div class="lbl">Ghi chú kho</div>
+    <div class="line"></div>
+  </div>
+</div>
+
+<script>
+// ---- Demo data (fake) ----
+const order = {
+  tracking: "DEMO1234",
+  partner: "DEMO",
+  sender:   { name: "Nguyễn Văn An", phone: "0901234567",
+              addr: "12 Nguyễn Huệ, Phường Bến Nghé, Quận 1, Hồ Chí Minh", note: "-" },
+  receiver: { name: "Trần Thị Bình", phone: "0912345678",
+              addr: "45 Lê Lợi, Phường Bến Thành, Quận 1, Hồ Chí Minh", note: "KHONGCHOXEMHANG" },
+  weight: "5 kg", dims: "20 x 5 x 20", packWeight: "5",
+  items: [
+    { cat: "Home & Living", qty: 2, name: "Kệ để đồ nhà bếp inox 304 cao cấp, chịu lực tốt" },
+  ],
+};
+
+// ?demo=multi → stress-test with many items (made-up names, layout check only)
+if (new URLSearchParams(location.search).get("demo") === "multi") {
+  order.items = [
+    { cat: "Home & Living", qty: 2, name: "Kệ để đồ nhà bếp inox 304 cao cấp, chịu lực tốt" },
+    { cat: "Pets", qty: 1, name: "[Chính hãng] Pate Catchy 400g, pate trong thạch cho mèo mọi lứa tuổi đầy đủ hương vị thơm ngon" },
+    { cat: "Pets", qty: 3, name: "Cát vệ sinh cho mèo hương táo 10L" },
+    { cat: "Beauty", qty: 1, name: "Sữa rửa mặt dịu nhẹ cho da nhạy cảm 150ml" },
+    { cat: "Home & Living", qty: 4, name: "Hộp đựng thực phẩm thuỷ tinh chịu nhiệt nắp gài 1000ml" },
+    { cat: "Electronics", qty: 1, name: "Cáp sạc nhanh USB-C to Lightning 1m bọc dù" },
+    { cat: "Fashion", qty: 2, name: "Áo thun cotton unisex cổ tròn form rộng size L" },
+    { cat: "Books", qty: 1, name: "Sổ tay bìa da A5 200 trang kẻ ngang" },
+  ];
+}
+
+// ---- Masking ----
+const maskName = n => {
+  const p = n.trim().split(/\s+/);
+  if (p.length === 1) return p[0][0] + "***";
+  return p.map((w, i) => i === 0 ? w : w[0] + "***").join(" ");
+};
+const maskPhone = s => s.length <= 6 ? s : s.slice(0, 3) + "*".repeat(s.length - 6) + s.slice(-3);
+const maskAddr = a => {
+  const seen = new Set();
+  const segs = a.split(",").map(s => s.trim()).filter(s => s && !seen.has(s.toLowerCase()) && seen.add(s.toLowerCase()));
+  segs[0] = segs[0].replace(/[\p{L}\d\/\-]*\d[\p{L}\d\/\-]*/u, "***"); // hide house number
+  return segs.join(", ");
+};
+
+const $ = id => document.getElementById(id);
+$("tn").textContent = order.tracking;
+for (const [k, p] of [["s", order.sender], ["r", order.receiver]]) {
+  $(k + "-name").textContent = maskName(p.name);
+  $(k + "-phone").textContent = "SĐT: " + maskPhone(p.phone);
+  $(k + "-addr").textContent = maskAddr(p.addr);
+  $(k + "-note").textContent = "Ghi chú: " + (p.note && p.note !== "-" ? p.note : "–");
+}
+$("w").textContent = order.weight;
+$("dim").textContent = order.dims;
+$("pw").textContent = order.packWeight;
+const ul = $("goods");
+for (const it of order.items) {
+  const li = document.createElement("li");
+  li.innerHTML = `<span class="qty"></span><span><span class="cat"></span> <span class="nm"></span></span>`;
+  li.querySelector(".qty").textContent = it.qty + "x";
+  li.querySelector(".cat").textContent = `[${it.cat}]`;
+  li.querySelector(".nm").textContent = it.name;
+  ul.appendChild(li);
+}
+
+
+const qr = qrcode(0, "M");
+qr.addData(order.tracking); qr.make();
+$("qr").innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+JsBarcode("#bc", order.tracking, { format: "CODE128", displayValue: false, margin: 12, height: 60, width: 2 });
+$("bc").setAttribute("preserveAspectRatio", "none");
+
+// Fit the item list into its box once layout is final:
+// shrink text down to 6pt, then replace the tail with "+ N loại khác".
+function fitItems() {
+  const lis = [...ul.children];
+  lis.forEach(li => li.style.display = "");
+  ul.querySelector(".more")?.remove();
+  for (let fs = 8; fs >= 6; fs -= 0.2) {
+    ul.style.fontSize = fs + "pt";
+    if (ul.scrollHeight <= ul.clientHeight) return;
+  }
+  const more = document.createElement("li");
+  more.className = "more";
+  ul.appendChild(more);
+  for (let hidden = 1; hidden < lis.length; hidden++) {
+    lis[lis.length - hidden].style.display = "none";
+    const rest = lis.slice(lis.length - hidden);
+    more.innerHTML = `<span class="qty">+${rest.reduce((s, li) => s + parseInt(li.querySelector(".qty").textContent), 0)}</span><b>${hidden} loại khác — xem trên app</b>`;
+    if (ul.scrollHeight <= ul.clientHeight) return;
+  }
+}
+window.addEventListener("load", () => requestAnimationFrame(fitItems));
+</script>
+</body>
+</html>
