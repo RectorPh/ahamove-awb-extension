@@ -40,6 +40,10 @@ function render(o) {
   document.title = "AWB_" + o.tracking; // default file name for "Save as PDF"
   $("tb-tn").textContent = o.tracking;
   $("tn").textContent = o.tracking;
+  if (o.partner) {
+    $("pid").textContent = o.partner;
+    $("partner").hidden = false;
+  }
   for (const [k, p] of [["s", o.sender || {}], ["r", o.receiver || {}]]) {
     $(k + "-name").textContent = maskName(p.name);
     $(k + "-phone").textContent = "SĐT: " + maskPhone(p.phone);
@@ -118,6 +122,16 @@ function fitTracking() {
   el.style.whiteSpace = "";
 }
 
+// Long partner ids shrink (13pt → 8pt) so the tag never pushes the logo.
+function fitPartner() {
+  const el = $("pid");
+  if ($("partner").hidden) return;
+  for (let pt = 13; pt >= 8; pt -= 0.5) {
+    el.style.fontSize = pt + "pt";
+    if (el.scrollWidth <= el.clientWidth) return;
+  }
+}
+
 (async () => {
   let o;
   try {
@@ -136,6 +150,7 @@ function fitTracking() {
   await document.fonts.ready;
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
   fitTracking();
+  fitPartner();
   fitItems();
   document.body.dataset.ready = "1";
   $("btn-print").onclick = () => {

@@ -31,10 +31,14 @@ body.embed .stage { padding: 16px 12px 20px; }
 .box { border: 0.4mm solid #000; }
 .lbl { font-size: 6.6pt; text-transform: uppercase; letter-spacing: .4px; color: #333; }
 
-.head { display: flex; align-items: center; }
+.head { display: flex; align-items: center; justify-content: space-between; gap: 3mm; }
 .logo { display: flex; align-items: center; gap: 1.6mm; }
 .logo img { height: 7.5mm; width: auto; display: block; }
 .logo span { font-size: 15pt; font-weight: 800; letter-spacing: -.2px; color: #000; }
+/* Partner ID: right side of the header, level with the logo */
+.partner { min-width: 0; max-width: 62mm; text-align: right; }
+.partner .lbl { font-size: 5.6pt; line-height: 1.1; }
+.partner .pid { font-size: 13pt; font-weight: 900; letter-spacing: .5px; line-height: 1.05; text-transform: uppercase; white-space: nowrap; }
 
 .track { display: flex; gap: 2.5mm; padding: 1.8mm 2mm; align-items: center; }
 .qr { width: 22mm; height: 22mm; flex: none; }

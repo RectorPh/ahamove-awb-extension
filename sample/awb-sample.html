@@ -14,11 +14,14 @@
   .box { border: 0.4mm solid #000; }
   .lbl { font-size: 6.6pt; text-transform: uppercase; letter-spacing: .4px; color: #333; }
 
-  /* Header: logo */
-  .head { display: flex; align-items: center; justify-content: space-between; }
+  /* Header: logo left, partner id right */
+  .head { display: flex; align-items: center; justify-content: space-between; gap: 3mm; }
   .logo { display: flex; align-items: center; gap: 1.6mm; }
   .logo img { height: 7.5mm; width: auto; display: block; }
   .logo span { font-size: 15pt; font-weight: 800; letter-spacing: -.2px; color: #000; }
+  .partner { min-width: 0; max-width: 62mm; text-align: right; }
+  .partner .lbl { font-size: 5.6pt; line-height: 1.1; }
+  .partner .pid { font-size: 13pt; font-weight: 900; letter-spacing: .5px; line-height: 1.05; text-transform: uppercase; white-space: nowrap; }
 
   /* Tracking: QR left, number + barcode right */
   .track { display: flex; gap: 2.5mm; padding: 1.8mm 2mm; align-items: center; }
@@ -56,6 +59,7 @@
 <div class="label">
   <div class="head">
     <div class="logo"><img src="../assets/logo-a-bw.png" alt=""><span>Ahamove</span></div>
+    <div class="partner"><div class="lbl">Partner ID</div><div class="pid" id="pid"></div></div>
   </div>
 
   <div class="box track">
@@ -104,7 +108,7 @@
 // ---- Demo data (fake) ----
 const order = {
   tracking: "DEMO1234",
-  partner: "DEMO",
+  partner: "ghnbulky",
   sender:   { name: "Nguyễn Văn An", phone: "0901234567",
               addr: "12 Nguyễn Huệ, Phường Bến Nghé, Quận 1, Hồ Chí Minh", note: "-" },
   receiver: { name: "Trần Thị Bình", phone: "0912345678",
@@ -145,6 +149,7 @@ const maskAddr = a => {
 
 const $ = id => document.getElementById(id);
 $("tn").textContent = order.tracking;
+$("pid").textContent = order.partner;
 for (const [k, p] of [["s", order.sender], ["r", order.receiver]]) {
   $(k + "-name").textContent = maskName(p.name);
   $(k + "-phone").textContent = "SĐT: " + maskPhone(p.phone);

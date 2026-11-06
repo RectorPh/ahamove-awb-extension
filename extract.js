@@ -28,7 +28,8 @@ function extractAwbOrder() {
       tracking: clean(vm.trackingNumber || r.tracking_number),
       warehouseId: clean(d._id),
       status: clean(d.status),
-      partner: clean(d.partner),
+      // warehouse ids look like "GHNBULKY_GYELNGHC": the prefix is the partner
+      partner: clean(d.partner) || (/^([A-Za-z0-9]+)_/.exec(clean(d._id)) || [])[1]?.toLowerCase() || "",
       sender: { name: clean(s.name), phone: clean(s.mobile), addr: clean(s.address), note: clean(s.remarks) },
       receiver: { name: clean(r.name), phone: clean(r.mobile), addr: clean(r.address), note: clean(r.remarks) },
       weight: clean(pi.weight) || (dim.weight != null ? dim.weight + " kg" : ""),
@@ -73,7 +74,7 @@ function extractAwbOrder() {
     tracking,
     warehouseId: "",
     status: "",
-    partner: "",
+    partner: ((text(root).match(/Đối tác bán hàng:\s*(\S+)/i) || [])[1] || "").toLowerCase(),
     sender: readCard("Lấy hàng"),
     receiver: readCard("Giao hàng"),
     weight: text(cell("Khối lượng")),

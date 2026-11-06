@@ -26,6 +26,7 @@ Hướng dẫn có hình minh hoạ: tải [`huong-dan-su-dung.html`](huong-dan-
 
 | Phần | Nguồn | Ghi chú |
 | --- | --- | --- |
+| Partner ID (góc phải trên, ngang logo) | Đối tác của đơn (vd. `GHNBULKY`) | Chữ in hoa; ID dài thì chữ tự nhỏ lại. Không có thì để trống |
 | QR + barcode + chữ lớn | Tracking number của đơn (vd. `DEMO1234`) | Barcode Code128, QR mức sửa lỗi M |
 | Người gửi / Người nhận | Thẻ "Lấy hàng" / "Giao hàng" | Che bớt: tên giữ chữ đầu (`Nguyễn V*** A***`), SĐT giữ 3 số đầu + 3 số cuối, địa chỉ ẩn số nhà và bỏ đoạn lặp |
 | Hàng hoá | Khối lượng, kích thước, KL đóng gói, danh sách `Nx [Ngành hàng] Tên` | Nhiều món thì chữ tự nhỏ tới 6pt; vẫn không đủ thì gộp phần cuối thành "+N loại khác — xem trên app" |

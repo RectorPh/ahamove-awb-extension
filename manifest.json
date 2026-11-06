@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Ahamove AWB – Phiếu lưu kho",
   "short_name": "Ahamove AWB",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Tạo AWB (A6) có QR + barcode từ pop-up chi tiết đơn trên Ahamove Warehouse để in dán lên hàng.",
   "action": {
     "default_title": "Tạo AWB cho đơn đang mở",
