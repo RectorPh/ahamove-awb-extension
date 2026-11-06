@@ -14,7 +14,7 @@ Hướng dẫn có hình minh hoạ: tải [`huong-dan-su-dung.html`](huong-dan-
 
 ## Cách dùng
 
-1. Vào https://app.ahamove.com/v1/warehouse → chọn **Lấy hàng thất bại**.
+1. Vào https://app.ahamove.com/v1/warehouse → chọn **Giao hàng thất bại**.
 2. Bấm vào một mã đơn để mở pop-up chi tiết.
 3. Bấm icon **Ahamove AWB** trên thanh công cụ → cửa sổ AWB hiện ngay trên trang, đè lên pop-up đơn (không mở tab mới).
 4. Bấm **In / Lưu PDF (A6)** → hộp thoại in của Chrome:
